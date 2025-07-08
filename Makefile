@@ -84,7 +84,6 @@ clean_npm_cache:
 	@echo "Cleaning npm cache..."
 	cd src/frontend && npm cache clean --force
 	$(call CLEAR_DIRS,src/frontend/node_modules src/frontend/build src/backend/base/langflow/frontend)
-	rm -f src/frontend/package-lock.json
 	@echo "$(GREEN)NPM cache and frontend directories cleaned.$(NC)"
 
 clean_all: clean_python_cache clean_npm_cache # clean all caches and temporary directories

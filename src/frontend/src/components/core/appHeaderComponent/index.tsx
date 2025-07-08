@@ -92,7 +92,7 @@ export default function AppHeader(): JSX.Element {
         <>
           <Button
             unstyled
-            className="hidden items-center whitespace-nowrap pr-2 lg:inline"
+            className="hidden items-center whitespace-nowrap pr-2 lg:inline hidden"
           >
             <CustomLangflowCounts />
           </Button>

@@ -13,6 +13,7 @@ export const URLs = {
   LOGOUT: `logout`,
   LOGIN: `login`,
   AUTOLOGIN: "auto_login",
+  AUTO_LOGIN_WITH_TOKEN: "auto_login_with_token",
   REFRESH: "refresh",
   BUILD: `build`,
   CUSTOM_COMPONENT: `custom_component`,

@@ -13,6 +13,7 @@ import useAlertStore from "../../stores/alertStore";
 import useFlowStore from "../../stores/flowStore";
 import { checkDuplicateRequestAndStoreRequest } from "./helpers/check-duplicate-requests";
 import { useLogout, useRefreshAccessToken } from "./queries/auth";
+import { getIframeToken } from "../../utils/iframe-token";
 
 // Create a new Axios instance
 const api: AxiosInstance = axios.create({
@@ -47,6 +48,12 @@ function ApiInterceptor() {
 
         if (accessToken && !isAuthorizedURL(config?.url)) {
           config.headers["Authorization"] = `Bearer ${accessToken}`;
+        }
+
+        // Add iframe token to all requests if available
+        const iframeToken = getIframeToken();
+        if (iframeToken) {
+          config.headers["X-Iframe-Token"] = iframeToken;
         }
 
         if (!isExternalURL(url)) {
@@ -160,6 +167,12 @@ function ApiInterceptor() {
 
         if (accessToken && !isAuthorizedURL(config?.url)) {
           config.headers["Authorization"] = `Bearer ${accessToken}`;
+        }
+
+        // Add iframe token to all requests if available
+        const iframeToken = getIframeToken();
+        if (iframeToken) {
+          config.headers["X-Iframe-Token"] = iframeToken;
         }
 
         const currentOrigin = window.location.origin;

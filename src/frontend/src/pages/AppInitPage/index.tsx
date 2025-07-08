@@ -12,6 +12,7 @@ import useFlowsManagerStore from "@/stores/flowsManagerStore";
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { LoadingPage } from "../LoadingPage";
+import { useGetAutoLoginWithToken } from "../../controllers/API/queries/auth/use-get-auto-login-with-token";
 
 export function AppInitPage() {
   const refreshStars = useDarkStore((state) => state.refreshStars);
@@ -22,7 +23,7 @@ export function AppInitPage() {
 
   const { isFetched: isLoaded } = useCustomPrimaryLoading();
 
-  const { isFetched, refetch } = useGetAutoLogin({ enabled: isLoaded });
+  const { isFetched, refetch } = useGetAutoLoginWithToken({ enabled: isLoaded });
   useGetVersionQuery({ enabled: isFetched });
   const { isFetched: isConfigFetched } = useGetConfig({ enabled: isFetched });
   useGetGlobalVariables({ enabled: isFetched });

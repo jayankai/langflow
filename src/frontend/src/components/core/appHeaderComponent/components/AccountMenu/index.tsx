@@ -121,40 +121,6 @@ export const AccountMenu = () => {
             </div>
 
             <div>
-              <HeaderMenuItemLink newPage href={GITHUB_URL}>
-                <span
-                  data-testid="menu_github_button"
-                  id="menu_github_button"
-                  className="flex items-center gap-2"
-                >
-                  <FaGithub className="h-4 w-4" />
-                  GitHub
-                </span>
-              </HeaderMenuItemLink>
-              <HeaderMenuItemLink newPage href={DISCORD_URL}>
-                <span
-                  data-testid="menu_discord_button"
-                  id="menu_discord_button"
-                  className="flex items-center gap-2"
-                >
-                  <FaDiscord className="h-4 w-4 text-[#5865F2]" />
-                  Discord
-                </span>
-              </HeaderMenuItemLink>
-              <HeaderMenuItemLink newPage href={TWITTER_URL}>
-                <span
-                  data-testid="menu_twitter_button"
-                  id="menu_twitter_button"
-                  className="flex items-center gap-2"
-                >
-                  <ForwardedIconComponent
-                    strokeWidth={2}
-                    name="TwitterX"
-                    className="h-4 w-4"
-                  />
-                  X
-                </span>
-              </HeaderMenuItemLink>
             </div>
 
             <div className="flex items-center justify-between px-4 py-[6.5px] text-sm">

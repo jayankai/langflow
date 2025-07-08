@@ -44,7 +44,7 @@ export const HeaderButtons = ({
 
   return (
     <>
-      {!isDismissedDialog && (
+{!isDismissedDialog && (
         <>
           <CustomGetStartedProgress
             userData={userData!}

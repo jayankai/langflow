@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: langflow-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-langflow}
+      POSTGRES_USER: ${POSTGRES_USER:-db_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-P@ssw0rd123!}
+      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD:-trust}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - langflow-network
+
+  # Langflow Application
+  langflow:
+    build:
+      context: .
+      dockerfile: docker/build_and_push.Dockerfile
+    container_name: langflow-app
+    environment:
+      - LANGFLOW_DATABASE_URL=${LANGFLOW_DATABASE_URL}
+      - LANGFLOW_HOST=${LANGFLOW_HOST:-0.0.0.0}
+      - LANGFLOW_PORT=${LANGFLOW_PORT:-7860}
+      - LANGFLOW_ENABLE_ANALYTICS=${LANGFLOW_ENABLE_ANALYTICS:-false}
+      - SYSTEM_MANAGERS=${SYSTEM_MANAGERS}
+      - LANGFLOW_AUTHENTICATION_PROXY_SECRET=${LANGFLOW_AUTHENTICATION_PROXY_SECRET}
+      - DISABLE_AUTHENTICATION_PROXY=${DISABLE_AUTHENTICATION_PROXY:-false}
+      - AUTO_LOGIN=${AUTO_LOGIN:-false}
+    ports:
+      - "${LANGFLOW_PORT:-7860}:7860"
+    depends_on:
+      - postgres
+    networks:
+      - langflow-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  langflow-network:
+    driver: bridge
