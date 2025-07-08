@@ -89,14 +89,6 @@ export default function AppHeader(): JSX.Element {
         className={`relative left-3 z-30 flex shrink-0 items-center gap-3`}
         data-testid="header_right_section_wrapper"
       >
-        <>
-          <Button
-            unstyled
-            className="hidden items-center whitespace-nowrap pr-2 lg:inline hidden"
-          >
-            <CustomLangflowCounts />
-          </Button>
-        </>
         <AlertDropdown
           notificationRef={notificationContentRef}
           onClose={() => setActiveState(null)}
