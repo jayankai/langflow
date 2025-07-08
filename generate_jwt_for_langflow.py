@@ -27,6 +27,7 @@ def create_jwt_payload(email: str, expiration_hours: int = 24) -> str:
     now = int(time.time())
     payload = {
         "email": email,
+        "username": "langflow",
         "iat": now,
         "exp": now + (expiration_hours * 3600),
     }
