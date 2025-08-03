@@ -82,8 +82,8 @@ export function AuthProvider({ children }): React.ReactElement {
     autoLogin: string,
     refreshToken?: string,
   ) {
-    cookies.set(LANGFLOW_ACCESS_TOKEN, newAccessToken, { path: "/" });
-    cookies.set(LANGFLOW_AUTO_LOGIN_OPTION, autoLogin, { path: "/" });
+    cookies.set(LANGFLOW_ACCESS_TOKEN, newAccessToken, { path: "/", sameSite: "none", secure: true, });
+    cookies.set(LANGFLOW_AUTO_LOGIN_OPTION, autoLogin, { path: "/", sameSite: "none", secure: true, });
     setLocalStorage(LANGFLOW_ACCESS_TOKEN, newAccessToken);
 
     if (refreshToken) {
