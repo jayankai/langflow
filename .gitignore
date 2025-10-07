@@ -276,8 +276,18 @@ src/frontend/temp
 .history
 
 .dspy_cache/
+<<<<<<< HEAD
 *.db
 *.mcp.json
 
 .env
 .env.*
+=======
+*.db*
+*.mcp.json
+
+news-aggregated.json
+CLAUDE.md
+
+member_servers.json
+>>>>>>> e06544cd743d3d0995d5c88135b56a6a5b0139d5
