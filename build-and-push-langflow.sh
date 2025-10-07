@@ -106,6 +106,62 @@ login_to_registry() {
   fi
 }
 
+# Tag existing latest image as previous
+tag_previous_image() {
+  echo "🏷️  Tagging previous latest image..."
+
+  # Check if latest image exists
+  if docker pull "${REGISTRY_URL}/langflow:latest" &>/dev/null; then
+    TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+    PREVIOUS_TAG="previous-${TIMESTAMP}"
+
+    echo "   Tagging latest as: ${PREVIOUS_TAG}"
+    docker tag "${REGISTRY_URL}/langflow:latest" "${REGISTRY_URL}/langflow:${PREVIOUS_TAG}"
+    docker push "${REGISTRY_URL}/langflow:${PREVIOUS_TAG}"
+
+    echo "✅ Previous image tagged as: ${PREVIOUS_TAG}"
+  else
+    echo "ℹ️  No existing latest image found, skipping previous tag"
+  fi
+}
+
+# Clean up old images (keep max 5)
+cleanup_old_images() {
+  echo "🧹 Cleaning up old images (keeping max 5)..."
+
+  if [[ "$REGISTRY_URL" == *".azurecr.io" ]] && command -v az &> /dev/null; then
+    REGISTRY_NAME=$(echo "$REGISTRY_URL" | sed 's/\.azurecr\.io//')
+
+    # Get all tags for langflow repository
+    TAGS=$(az acr repository show-tags --name "$REGISTRY_NAME" --repository langflow --orderby time_desc --output tsv 2>/dev/null || echo "")
+
+    if [ -n "$TAGS" ]; then
+      # Convert to array and keep only the first 5
+      TAG_ARRAY=($TAGS)
+      TOTAL_TAGS=${#TAG_ARRAY[@]}
+
+      if [ $TOTAL_TAGS -gt 5 ]; then
+        echo "   Found $TOTAL_TAGS images, keeping 5 most recent"
+
+        # Delete older tags (skip first 5)
+        for ((i=5; i<TOTAL_TAGS; i++)); do
+          OLD_TAG="${TAG_ARRAY[$i]}"
+          echo "   Deleting old tag: $OLD_TAG"
+          az acr repository delete --name "$REGISTRY_NAME" --image "langflow:$OLD_TAG" --yes
+        done
+
+        echo "✅ Cleaned up old images"
+      else
+        echo "   Found $TOTAL_TAGS images (≤5), no cleanup needed"
+      fi
+    else
+      echo "ℹ️  No existing images found"
+    fi
+  else
+    echo "ℹ️  Skipping cleanup (not Azure or az cli not available)"
+  fi
+}
+
 # Build the Docker image
 build_image() {
   echo "🏗️  Building Docker image..."
@@ -115,12 +171,12 @@ build_image() {
   make clean_all 2>/dev/null || true
 
   # Build the image using the existing Dockerfile
+  echo "🏗️  Starting fresh build..."
   docker buildx build \
     --platform linux/amd64 \
     -f docker/build_and_push.Dockerfile \
     -t "$IMAGE_NAME" \
-    --cache-from type=gha \
-    --cache-to type=gha,mode=max \
+    --no-cache \
     --progress=plain \
     .
 
@@ -146,7 +202,7 @@ push_image() {
   fi
 }
 
-# Optional: Update Azure Container App (if applicable)
+# Update Azure Container App
 update_container_app() {
   if [[ "$REGISTRY_URL" == *".azurecr.io" ]] && command -v az &> /dev/null; then
     REGISTRY_NAME=$(echo "$REGISTRY_URL" | sed 's/\.azurecr\.io//')
@@ -184,6 +240,8 @@ main() {
 
   check_tools
   login_to_registry
+  tag_previous_image
+  cleanup_old_images
   build_image
   push_image
   update_container_app

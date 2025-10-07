@@ -35,10 +35,19 @@ class AzureChatOpenAIComponent(LCModelComponent):
         MessageTextInput(
             name="azure_endpoint",
             display_name="Azure Endpoint",
-            info="Your Azure endpoint, including the resource. Example: `https://example-resource.azure.openai.com/`",
+            info=(
+                "Your Azure endpoint, including the resource. Examples: "
+                "`https://example-resource.azure.openai.com/` or "
+                "`https://swedencentral.api.cognitive.microsoft.com/`"
+            ),
             required=True,
         ),
-        MessageTextInput(name="azure_deployment", display_name="Deployment Name", required=True),
+        MessageTextInput(
+            name="azure_deployment",
+            display_name="Deployment Name",
+            info="The deployment name for your model. Example: `chat` for the endpoint `/deployments/chat/`",
+            required=True,
+        ),
         SecretStrInput(name="api_key", display_name="API Key", required=True),
         DropdownInput(
             name="api_version",
@@ -78,6 +87,10 @@ class AzureChatOpenAIComponent(LCModelComponent):
         max_tokens = self.max_tokens
         stream = self.stream
 
+        # Ensure endpoint format is correct
+        if not azure_endpoint.endswith("/"):
+            azure_endpoint = azure_endpoint + "/"
+
         try:
             output = AzureChatOpenAI(
                 azure_endpoint=azure_endpoint,
@@ -89,7 +102,7 @@ class AzureChatOpenAIComponent(LCModelComponent):
                 streaming=stream,
             )
         except Exception as e:
-            msg = f"Could not connect to AzureOpenAI API: {e}"
+            msg = f"Could not connect to Azure OpenAI API: {e}"
             raise ValueError(msg) from e
 
         return output
