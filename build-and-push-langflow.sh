@@ -178,6 +178,8 @@ build_image() {
     -t "$IMAGE_NAME" \
     --no-cache \
     --progress=plain \
+    --build-arg BUILD_TYPE="$BUILD_TYPE" \
+    --build-arg NODE_ENV="$NODE_ENV" \
     .
 
   if [ $? -eq 0 ]; then
@@ -213,11 +215,23 @@ update_container_app() {
 
     # Check if the container app exists
     if az containerapp show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
+      # Set environment variables for the container app
+      ENV_VARS="LANGFLOW_DATABASE_URL=${LANGFLOW_DATABASE_URL}"
+      ENV_VARS="$ENV_VARS LANGFLOW_SECRET_KEY=${LANGFLOW_SECRET_KEY}"
+      ENV_VARS="$ENV_VARS LANGFLOW_AUTHENTICATION_PROXY_SECRET=${LANGFLOW_AUTHENTICATION_PROXY_SECRET}"
+      ENV_VARS="$ENV_VARS AUTO_LOGIN=${AUTO_LOGIN:-false}"
+      ENV_VARS="$ENV_VARS LANGFLOW_ENABLE_ANALYTICS=${LANGFLOW_ENABLE_ANALYTICS:-false}"
+      ENV_VARS="$ENV_VARS DISABLE_AUTHENTICATION_PROXY=${DISABLE_AUTHENTICATION_PROXY:-false}"
+      ENV_VARS="$ENV_VARS SYSTEM_MANAGERS=${SYSTEM_MANAGERS}"
+      ENV_VARS="$ENV_VARS BUILD_TYPE=${BUILD_TYPE}"
+      ENV_VARS="$ENV_VARS NODE_ENV=${NODE_ENV}"
+
       az containerapp update \
         --name "$APP_NAME" \
         --resource-group "$RESOURCE_GROUP" \
         --image "$IMAGE_NAME" \
-        --revision-suffix "manual-$(date +%s)"
+        --revision-suffix "manual-$(date +%s)" \
+        --set-env-vars $ENV_VARS
 
       echo "✅ Container app updated successfully"
     else
